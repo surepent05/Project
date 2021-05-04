@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Code to deploy the latest version of the app goes here...
+#
+# 1. backup the database
+# 2. pull latest code from github
+# 3. restart any services needed
+
+[ -z $1 ] && branch_name=master || branch_name=$1
+bash ./backup
+
+cd /opt/app/code/
+#git checkout ${branch_name}
+rm -rf code.tgz
+tar czf code.tgz banana/ manage.py requirements.txt
+
+cd /opt/app/etc/docker
+docker-compose build banana-api
+docker-compose restart -t 30 banana-api
+docker exec -it banana-api sh -c "python manage.py migrate"

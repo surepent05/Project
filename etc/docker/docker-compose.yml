@@ -1,0 +1,57 @@
+version: '3.5'
+
+services:
+  banana-frontend:
+    image: nginx:alpine
+    container_name: banana-frontend
+    volumes:
+      - /opt/app/etc/nginx/banana-frontend.conf:/etc/nginx/conf.d/banana-frontend.conf
+      - /opt/app/data/logs/:/opt/
+    depends_on:
+      - banana-api
+      - postgres
+    networks:
+      django-suite:
+        aliases:
+          - banana-frontend
+    ports:
+      - 80:80
+    restart: on-failure
+
+  banana-api:
+    build:
+      dockerfile: Dockerfile
+      context: /opt/app/code/
+    image: banana-api:latest
+    container_name: banana-api
+    depends_on:
+      - postgres
+    networks:
+      django-suite:
+        aliases:
+          - banana-api
+
+  postgres:
+    container_name: django_postgresdb
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+       - /opt/app/data/database/:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      django-suite:
+        aliases:
+          - postgres
+    restart: unless-stopped
+
+networks:
+  django-suite:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.10.0/28
+          gateway: 192.168.10.1

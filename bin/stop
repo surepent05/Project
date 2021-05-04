@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# stop all services here...
+cd /opt/app/etc/docker
+docker-compose stop
+docker-compose ps

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+backup_name=/opt/app/data/backups/banana_$(date +%s).gz
+docker exec -t django_postgresdb sh -c "PGPASSWORD="postgresadmin123" pg_dumpall -c -U postgres" | gzip > ${backup_name}
+echo "Backup Name - $backup_name"
+if [ ! -z $1 ]
+then
+rsync -azv $backup_name ubuntu@$1:/opt/app/data/backups/
+fi

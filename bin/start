@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# start all services needed to run the app here...
+cd /opt/app/etc/docker
+docker-compose up -d
+docker-compose ps
